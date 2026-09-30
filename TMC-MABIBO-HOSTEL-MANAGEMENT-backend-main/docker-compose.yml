@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: tucasa-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tucasa_mabibo
+      POSTGRES_USER: tucasa_user
+      POSTGRES_PASSWORD: changeme
+    ports:
+      - "5433:5432"
+    volumes:
+      - tucasa-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tucasa_user -d tucasa_mabibo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  tucasa-postgres-data:

@@ -1,0 +1,22 @@
+# Build artifacts
+target/
+node_modules/
+dist/
+
+# Runtime uploads
+uploads/
+
+# IDE / editor
+.idea/
+.vscode/
+*.iml
+
+# Logs / temp
+*.log
+nohup.out
+
+# TypeScript build info
+*.tsbuildinfo
+
+# OS files
+.DS_Store
