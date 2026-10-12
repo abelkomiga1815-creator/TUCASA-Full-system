@@ -6,7 +6,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 
-export function CreateEventModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function CreateEventModal({
+  open,
+  onClose,
+  onSuccess
+}: {
+  open: boolean
+  onClose: () => void
+  onSuccess?: () => void
+}) {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [date, setDate] = useState("")
@@ -23,6 +31,7 @@ export function CreateEventModal({ open, onClose }: { open: boolean; onClose: ()
       setDescription("")
       setDate("")
       setLocation("")
+      onSuccess?.()
       onClose()
     } catch {
       toast.error("Could not create event")

@@ -20,7 +20,7 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="border-t bg-white py-6 text-center text-sm text-muted-foreground">
+    <footer className="border-t bg-white py-6 text-center text-sm text-muted-foreground dark:bg-card">
       <div className="mx-auto max-w-6xl px-4">
         <p className="font-medium">{siteConfig.branchName}</p>
         <p className="mt-1">{siteConfig.organizationName}</p>

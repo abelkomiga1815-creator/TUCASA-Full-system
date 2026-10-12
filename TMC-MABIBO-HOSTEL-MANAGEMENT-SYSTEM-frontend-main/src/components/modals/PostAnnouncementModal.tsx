@@ -6,7 +6,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 
-export function PostAnnouncementModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function PostAnnouncementModal({
+  open,
+  onClose,
+  onSuccess
+}: {
+  open: boolean
+  onClose: () => void
+  onSuccess?: () => void
+}) {
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
   const [loading, setLoading] = useState(false)
@@ -19,6 +27,7 @@ export function PostAnnouncementModal({ open, onClose }: { open: boolean; onClos
       toast.success("Announcement posted")
       setTitle("")
       setContent("")
+      onSuccess?.()
       onClose()
     } catch {
       toast.error("Could not post announcement")

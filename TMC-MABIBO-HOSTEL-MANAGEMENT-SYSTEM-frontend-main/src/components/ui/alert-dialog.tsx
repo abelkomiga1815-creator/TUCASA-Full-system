@@ -24,7 +24,7 @@ interface AlertDialogContentProps extends HTMLAttributes<HTMLDivElement> {}
 export const AlertDialogContent = ({ className, children, ...props }: AlertDialogContentProps) => (
   <div
     className={cn(
-      "relative z-50 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl animate-scale-in",
+      "relative z-50 w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl animate-scale-in",
       className
     )}
     {...props}

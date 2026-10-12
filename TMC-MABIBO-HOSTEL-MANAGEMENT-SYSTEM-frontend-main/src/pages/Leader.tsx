@@ -25,12 +25,12 @@ export default function Leader() {
     return (
       <div className="p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 w-48 bg-slate-200 rounded" />
-          <div className="h-4 w-64 bg-slate-200 rounded" />
+          <div className="h-8 w-48 bg-slate-200 rounded dark:bg-slate-700" />
+          <div className="h-4 w-64 bg-slate-200 rounded dark:bg-slate-700" />
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="h-32 bg-slate-100 rounded-lg" />
-            <div className="h-32 bg-slate-100 rounded-lg" />
-            <div className="h-32 bg-slate-100 rounded-lg" />
+            <div className="h-32 bg-slate-100 rounded-lg dark:bg-slate-800" />
+            <div className="h-32 bg-slate-100 rounded-lg dark:bg-slate-800" />
+            <div className="h-32 bg-slate-100 rounded-lg dark:bg-slate-800" />
           </div>
         </div>
       </div>
@@ -111,7 +111,7 @@ export default function Leader() {
           </div>
 
           {(!canUploadMaterials || !canPostAnnouncements || !canCreateEvents) && (
-            <Card className="bg-slate-50 border-dashed">
+            <Card className="bg-slate-50 border-dashed dark:bg-muted/30">
               <CardContent className="p-4 text-center text-sm text-muted-foreground">
                 <Lock size={20} className="mx-auto mb-2 opacity-50" />
                 <p>Some tools are locked. Contact an admin to request permissions.</p>

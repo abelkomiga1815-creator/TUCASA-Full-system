@@ -17,6 +17,7 @@ export interface User {
   role: Role
   status: "ACTIVE" | "SUSPENDED" | "INACTIVE"
   profilePicUrl?: string
+  mustChangePassword?: boolean
 }
 
 export interface AuthResponse {
@@ -27,6 +28,28 @@ export interface AuthResponse {
 }
 
 export interface RegisterResponse {
+  id: number
+  firstName: string
+  middleName?: string
+  lastName: string
+  email: string
+  phone: string
+  university: string
+  program: string
+  yearOfStudy: number
+  isBaptized: boolean
+  homeRegion: string
+  homeChurch: string
+  talent?: string
+  role: Role
+  status: "ACTIVE" | "SUSPENDED" | "INACTIVE"
+  profilePicUrl?: string
+  branchId?: number
+  branchName?: string
+  createdAt: string
+}
+
+export interface UserResponse {
   id: number
   firstName: string
   middleName?: string
@@ -253,19 +276,6 @@ export interface FeeBulkRequest {
   notes?: string
 }
 
-export interface ResetPasswordRequest {
-    identifier: string
-    channel: 'EMAIL' | 'SMS'
-    otp: string
-    newPassword: string
-    confirmPassword: string
-}
-
-export interface ForgotPasswordRequest {
-    identifier: string
-    channel: 'EMAIL' | 'SMS'
-}
-
 export interface LeaderPermission {
   id: number
   user: User
@@ -281,4 +291,27 @@ export interface LeaderPermissionRequest {
   canUploadMaterials: boolean
   canPostAnnouncements: boolean
   canCreateEvents: boolean
+}
+
+export interface AboutUsResponse {
+  id: number
+  title: string
+  description: string
+  mission: string
+  vision: string
+  contactInformation: string
+  organizationName: string
+  branchName: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AboutUsRequest {
+  title?: string
+  description?: string
+  mission?: string
+  vision?: string
+  contactInformation?: string
+  organizationName?: string
+  branchName?: string
 }

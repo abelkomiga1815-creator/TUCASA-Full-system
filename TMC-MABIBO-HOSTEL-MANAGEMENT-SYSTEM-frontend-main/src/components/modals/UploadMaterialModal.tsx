@@ -7,7 +7,15 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Select } from "@/components/ui/select"
 
-export function UploadMaterialModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function UploadMaterialModal({
+  open,
+  onClose,
+  onSuccess
+}: {
+  open: boolean
+  onClose: () => void
+  onSuccess?: () => void
+}) {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [type, setType] = useState("DOCUMENT")
@@ -28,6 +36,7 @@ export function UploadMaterialModal({ open, onClose }: { open: boolean; onClose:
       await leaderApi.uploadMaterial({ title, description, type, fileUrl })
       toast.success("Material uploaded")
       reset()
+      onSuccess?.()
       onClose()
     } catch {
       toast.error("Could not upload material")

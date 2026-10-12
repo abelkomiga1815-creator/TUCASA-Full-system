@@ -11,9 +11,9 @@ const variantClasses: Record<string, string> = {
   secondary: "bg-secondary text-secondary-foreground",
   outline: "border border-input text-foreground",
   destructive: "bg-destructive text-destructive-foreground",
-  success: "bg-green-500 text-white",
-  warning: "bg-amber-500 text-white",
-  info: "bg-sky-500 text-white",
+  success: "bg-success text-success-foreground",
+  warning: "bg-warning text-warning-foreground",
+  info: "bg-info text-info-foreground",
   soft: "bg-primary/10 text-primary",
   "soft-secondary": "bg-secondary/10 text-secondary",
 }

@@ -31,6 +31,7 @@ public class UserResponse {
     private String branchName;
     private String profilePicUrl;
     private LocalDateTime createdAt;
+    private Boolean mustChangePassword;
 
     public static UserResponse fromEntity(User u) {
         return UserResponse.builder()
@@ -53,6 +54,7 @@ public class UserResponse {
                 .branchName(u.getBranch() != null ? u.getBranch().getName() : null)
                 .profilePicUrl(u.getProfilePicUrl())
                 .createdAt(u.getCreatedAt())
+                .mustChangePassword(u.getMustChangePassword())
                 .build();
     }
 }

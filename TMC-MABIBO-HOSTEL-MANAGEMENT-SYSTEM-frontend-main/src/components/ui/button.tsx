@@ -10,7 +10,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const variantClasses: Record<string, string> = {
   default: "bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary shadow-soft hover:shadow-medium",
   secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/90 active:bg-secondary shadow-soft hover:shadow-medium",
-  outline: "border border-input bg-white hover:bg-muted active:bg-muted/50",
+  outline: "border border-input bg-white hover:bg-muted active:bg-muted/50 dark:bg-card dark:hover:bg-muted dark:active:bg-muted/50",
   destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:bg-destructive shadow-soft hover:shadow-medium",
   ghost: "hover:bg-muted active:bg-muted/50",
   link: "text-primary underline-offset-4 hover:underline",

@@ -39,9 +39,9 @@ export default function Fees() {
         <p className="text-muted-foreground">Your membership fee history and current status</p>
       </div>
 
-      <Card className={paidThisSemester ? "border-green-200 bg-green-50/50" : "border-amber-200 bg-amber-50/50"}>
+      <Card className={paidThisSemester ? "border-green-200 bg-green-50/50 dark:border-green-800/60 dark:bg-green-900/20" : "border-amber-200 bg-amber-50/50 dark:border-amber-800/60 dark:bg-amber-900/20"}>
         <CardContent className="flex items-center gap-4 p-5">
-          <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${paidThisSemester ? "bg-green-500/15 text-green-700" : "bg-amber-500/15 text-amber-700"}`}>
+          <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${paidThisSemester ? "bg-green-500/15 text-green-700 dark:text-green-300" : "bg-amber-500/15 text-amber-700 dark:text-amber-300"}`}>
             <Wallet size={24} />
           </div>
           <div>

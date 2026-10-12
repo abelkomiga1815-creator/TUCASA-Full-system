@@ -2,25 +2,30 @@ import { useEffect, useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { memberApi } from "@/api/endpoints/member"
 import { permissionsApi } from "@/api/endpoints/permissions"
-import { Material } from "@/types"
+import { Material, PaginatedResponse } from "@/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
-import { Plus, Upload } from "lucide-react"
+import { Plus, Upload, ChevronLeft, ChevronRight } from "lucide-react"
 
 export default function Materials() {
   const { user } = useAuth()
-  const [materials, setMaterials] = useState<Material[]>([])
+  const [data, setData] = useState<PaginatedResponse<Material> | null>(null)
   const [loading, setLoading] = useState(true)
   const [canUpload, setCanUpload] = useState(false)
   const [permLoading, setPermLoading] = useState(true)
+  const [page, setPage] = useState(0)
+
+  const materials = data?.content ?? []
+  const totalPages = data?.totalPages ?? 0
 
   useEffect(() => {
+    setLoading(true)
     memberApi
-      .getMaterials()
-      .then(setMaterials)
+      .getMaterials(10, page)
+      .then(setData)
       .finally(() => setLoading(false))
-  }, [])
+  }, [page])
 
   useEffect(() => {
     if (user?.role === "LEADER") {
@@ -64,23 +69,50 @@ export default function Materials() {
       ) : materials.length === 0 ? (
         <p className="text-sm text-muted-foreground">No materials have been uploaded yet.</p>
       ) : (
-        <div className="space-y-3">
-          {materials.map((m) => (
-            <Card key={m.id}>
-              <CardHeader>
-                <CardTitle className="text-base">{m.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">{m.description}</p>
-                <a href={m.fileUrl} target="_blank" rel="noreferrer">
-                  <Button variant="outline" size="sm">
-                    Download
-                  </Button>
-                </a>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <>
+          <div className="space-y-3">
+            {materials.map((m) => (
+              <Card key={m.id}>
+                <CardHeader>
+                  <CardTitle className="text-base">{m.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">{m.description}</p>
+                  <a href={m.fileUrl} target="_blank" rel="noreferrer">
+                    <Button variant="outline" size="sm">
+                      Download
+                    </Button>
+                  </a>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <div className="mt-6 flex items-center justify-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={page === 0}
+              >
+                <ChevronLeft size={16} />
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground px-4">
+                Page {page + 1} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                disabled={page >= totalPages - 1}
+              >
+                Next
+                <ChevronRight size={16} />
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   )

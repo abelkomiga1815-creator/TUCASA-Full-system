@@ -3,6 +3,7 @@ import { Calendar, Users, ChevronDown, ChevronRight } from "lucide-react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { imageUrl } from "@/utils/imageUrl"
 import { leadershipApi } from "@/api/endpoints/leadership"
 import { Regime } from "@/types"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -102,10 +103,10 @@ export default function PastLeadership() {
                     .map((leader) => (
                       <div
                         key={leader.positionId}
-                        className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg"
+                        className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg dark:bg-muted/30"
                       >
                         <Avatar className="h-12 w-12 flex-shrink-0">
-                          <AvatarImage src={leader.leader?.profilePicUrl} alt={leader.leader ? `${leader.leader.firstName} ${leader.leader.lastName}` : "Leader"} />
+                          <AvatarImage src={imageUrl(leader.leader?.profilePicUrl)} alt={leader.leader ? `${leader.leader.firstName} ${leader.leader.lastName}` : "Leader"} />
                           <AvatarFallback className="text-base">
                             {leader.leader
                               ? `${leader.leader.firstName[0]}${leader.leader.lastName[0]}`
@@ -133,7 +134,7 @@ export default function PastLeadership() {
         ))}
       </div>
 
-      <Card className="bg-slate-50 border-dashed">
+      <Card className="bg-slate-50 border-dashed dark:bg-muted/30">
         <CardContent className="p-6 text-center text-muted-foreground">
           <Users size={32} className="mx-auto mb-2 opacity-50" />
           <p className="font-medium">Immutable Historical Records</p>

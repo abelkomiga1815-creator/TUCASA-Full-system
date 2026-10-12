@@ -1,5 +1,5 @@
 import apiClient from "../client"
-import { AlumniRecord, PaginatedResponse, User } from "@/types"
+import { AlumniRecord, PaginatedResponse, User, UserResponse } from "@/types"
 
 export const leaderApi = {
   getActiveCount: () =>
@@ -54,5 +54,46 @@ export const adminApi = {
         membersByRole: Record<string, number>
         membersByYear: Record<string, number>
       }>("/api/admin/dashboard/stats")
-      .then((r) => r.data)
+      .then((r) => r.data),
+
+  adminResetPassword: (id: number, payload: { temporaryPassword: string; confirmTemporaryPassword: string }) =>
+    apiClient.put<UserResponse>(`/api/admin/members/${id}/reset-password`, payload).then((r) => r.data),
+
+  exportMembers: (memberIds: number[]) =>
+    apiClient
+      .post<Blob>(`/api/admin/members/export`, memberIds, {
+        responseType: "arraybuffer",
+        headers: { "Content-Type": "application/json" },
+      })
+      .then((r) => {
+        const url = window.URL.createObjectURL(new Blob([r.data], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        }))
+        const link = document.createElement("a")
+        link.href = url
+        link.setAttribute("download", "TUCASA_Member_Details_" + new Date().toISOString().split("T")[0] + ".xlsx")
+        document.body.appendChild(link)
+        link.click()
+        link.parentNode?.removeChild(link)
+        window.URL.revokeObjectURL(url)
+      }),
+
+  exportAllMembers: () =>
+    apiClient
+      .get<Blob>(`/api/admin/members/export/all`, {
+        responseType: "arraybuffer",
+        headers: { "Content-Type": "application/json" },
+      })
+      .then((r) => {
+        const url = window.URL.createObjectURL(new Blob([r.data], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        }))
+        const link = document.createElement("a")
+        link.href = url
+        link.setAttribute("download", "TUCASA_All_Members_" + new Date().toISOString().split("T")[0] + ".xlsx")
+        document.body.appendChild(link)
+        link.click()
+        link.parentNode?.removeChild(link)
+        window.URL.revokeObjectURL(url)
+      }),
 }

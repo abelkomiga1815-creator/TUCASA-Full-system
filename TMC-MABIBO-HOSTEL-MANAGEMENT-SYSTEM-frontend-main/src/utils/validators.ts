@@ -57,19 +57,9 @@ export const semesterUpdateSchema = z.object({
 
 export type SemesterUpdateFormValues = z.infer<typeof semesterUpdateSchema>
 
-// Forgot password schema
-export const forgotPasswordSchema = z.object({
-  identifier: z.string().min(1, "Email or phone is required"),
-  channel: z.enum(["EMAIL", "SMS"])
-})
-
-export type ForgotPasswordRequest = z.infer<typeof forgotPasswordSchema>
-
-// Reset password schema
-export const resetPasswordSchema = z.object({
-  identifier: z.string().min(1, "Email or phone is required"),
-  channel: z.enum(["EMAIL", "SMS"]),
-  otp: z.string().length(6, "OTP must be 6 digits").regex(/^\d{6}$/, "OTP must be 6 digits"),
+// Change password schema (for normal password change from settings)
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
   newPassword: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string()
 }).refine((data) => data.newPassword === data.confirmPassword, {
@@ -77,4 +67,26 @@ export const resetPasswordSchema = z.object({
   path: ["confirmPassword"]
 })
 
-export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>
+export type ChangePasswordRequest = z.infer<typeof changePasswordSchema>
+
+// Admin reset password schema
+export const adminResetPasswordSchema = z.object({
+  temporaryPassword: z.string().min(8, "Temporary password must be at least 8 characters"),
+  confirmTemporaryPassword: z.string()
+}).refine((data) => data.temporaryPassword === data.confirmTemporaryPassword, {
+  message: "Passwords do not match",
+  path: ["confirmTemporaryPassword"]
+})
+
+export type AdminResetPasswordRequest = z.infer<typeof adminResetPasswordSchema>
+
+// Force password change schema (for users who must change password after admin reset)
+export const forcePasswordChangeSchema = z.object({
+  newPassword: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string()
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"]
+})
+
+export type ForcePasswordChangeRequest = z.infer<typeof forcePasswordChangeSchema>

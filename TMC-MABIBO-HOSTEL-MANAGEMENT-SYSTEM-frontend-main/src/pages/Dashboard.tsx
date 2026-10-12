@@ -30,6 +30,9 @@ export default function Dashboard() {
   const [activeCount, setActiveCount] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState<"material" | "announcement" | "event" | null>(null)
+  // Bumped after a successful create so the recent lists below are refetched
+  // with the new record instead of waiting for a full page reload.
+  const [reloadKey, setReloadKey] = useState(0)
 
   const isLeaderOrAdmin = user?.role === "LEADER" || user?.role === "ADMIN"
 
@@ -40,8 +43,8 @@ export default function Dashboard() {
           memberApi.getAnnouncements(3),
           memberApi.getEvents(3)
         ])
-        setAnnouncements(a)
-        setEvents(e)
+        setAnnouncements(a.content ?? a)
+        setEvents(e.content ?? e)
         if (isLeaderOrAdmin) {
           const { count } = await leaderApi.getActiveCount()
           setActiveCount(count)
@@ -53,7 +56,7 @@ export default function Dashboard() {
       }
     }
     load()
-  }, [isLeaderOrAdmin])
+  }, [isLeaderOrAdmin, reloadKey])
 
   const stats = [
     {
@@ -159,7 +162,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8 animate-slide-up delay-300">
         {stats.map((stat, index) => (
           <Card key={stat.title} className="card-hover overflow-hidden relative animate-slide-up delay-100" style={{ animationDelay: `${index * 100}ms` }}>
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-white/50" />
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-white/50 dark:to-white/5" />
             <CardHeader className="relative z-10">
               <div className="flex items-center gap-2">
                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${stat.color}`}>
@@ -300,9 +303,21 @@ export default function Dashboard() {
       )}
 
       {/* Modals */}
-      <UploadMaterialModal open={modal === "material"} onClose={() => setModal(null)} />
-      <PostAnnouncementModal open={modal === "announcement"} onClose={() => setModal(null)} />
-      <CreateEventModal open={modal === "event"} onClose={() => setModal(null)} />
+      <UploadMaterialModal
+        open={modal === "material"}
+        onClose={() => setModal(null)}
+        onSuccess={() => setReloadKey((k) => k + 1)}
+      />
+      <PostAnnouncementModal
+        open={modal === "announcement"}
+        onClose={() => setModal(null)}
+        onSuccess={() => setReloadKey((k) => k + 1)}
+      />
+      <CreateEventModal
+        open={modal === "event"}
+        onClose={() => setModal(null)}
+        onSuccess={() => setReloadKey((k) => k + 1)}
+      />
     </div>
   )
 }

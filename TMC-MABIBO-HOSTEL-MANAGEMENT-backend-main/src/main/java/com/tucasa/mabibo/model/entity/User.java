@@ -89,6 +89,10 @@ public class User implements UserDetails {
     @Column(name = "profile_pic_url", length = 500)
     private String profilePicUrl;
 
+    @Column(name = "must_change_password", nullable = false)
+    @Builder.Default
+    private Boolean mustChangePassword = false;
+
     @Column(name = "email_verified_at")
     private LocalDateTime emailVerifiedAt;
 

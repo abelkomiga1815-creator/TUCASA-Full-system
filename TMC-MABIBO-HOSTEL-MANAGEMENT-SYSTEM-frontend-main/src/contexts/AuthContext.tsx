@@ -42,6 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await authApi.login(payload)
     if (res.refreshToken) localStorage.setItem("tucasa_refresh_token", res.refreshToken)
     persistSession(res.accessToken, res.user)
+    return res
   }, [])
 
   const register = useCallback(async (payload: FormData) => {
@@ -63,6 +64,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(updated)
   }, [])
 
+  const updateProfilePicture = useCallback(async (file: File) => {
+    const updatedUser = await authApi.updateProfilePicture(file)
+    refreshUser(updatedUser)
+    return updatedUser
+  }, [refreshUser])
+
+  const changePassword = useCallback(async (currentPassword: string, newPassword: string, confirmNewPassword: string) => {
+    await authApi.changePassword(currentPassword, newPassword, confirmNewPassword)
+    // Refresh user to get updated mustChangePassword status
+    const res = await authApi.me()
+    refreshUser(res)
+  }, [refreshUser])
+
   const markSemesterUpdated = useCallback(() => {
     if (!user) return
     localStorage.setItem(semesterUpdateKey(user.id), "true")
@@ -83,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, logout, refreshUser, semesterUpdated, markSemesterUpdated, redirectByRole }}
+      value={{ user, loading, login, register, logout, refreshUser, updateProfilePicture, changePassword, semesterUpdated, markSemesterUpdated, redirectByRole }}
     >
       {children}
     </AuthContext.Provider>

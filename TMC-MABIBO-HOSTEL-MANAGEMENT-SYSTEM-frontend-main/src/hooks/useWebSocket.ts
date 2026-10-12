@@ -5,6 +5,7 @@ import { ChatMessage } from "@/types"
 import { chatApi } from "@/api/endpoints/chat"
 
 const WS_URL = `${import.meta.env.VITE_API_URL ?? "http://localhost:8080"}/ws`
+const MAX_MESSAGES = 200
 
 export function useWebSocket(username: string | undefined) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -17,7 +18,7 @@ export function useWebSocket(username: string | undefined) {
     // Load persisted history first so refreshes keep past messages.
     chatApi
       .getMessages("public", 100)
-      .then((history) => setMessages(history))
+      .then((history) => setMessages(history.slice(-100)))
       .catch(() => {
         // history is best-effort; live subscription still works
       })
@@ -34,9 +35,13 @@ export function useWebSocket(username: string | undefined) {
           try {
             const body: ChatMessage = JSON.parse(frame.body)
             // Skip frames already present from history (same persisted id).
-            setMessages((prev) =>
-              body.id != null && prev.some((m) => m.id === body.id) ? prev : [...prev, body]
-            )
+            setMessages((prev) => {
+              const exists = body.id != null && prev.some((m) => m.id === body.id)
+              if (exists) return prev
+              const updated = [...prev, body]
+              // Limit message history to prevent memory issues
+              return updated.length > MAX_MESSAGES ? updated.slice(-MAX_MESSAGES) : updated
+            })
           } catch {
             // ignore malformed frames
           }

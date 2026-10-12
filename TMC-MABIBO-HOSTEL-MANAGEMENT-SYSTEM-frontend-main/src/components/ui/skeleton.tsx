@@ -9,7 +9,7 @@ export const Skeleton = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement
         "animate-pulse rounded-xl bg-muted",
         "relative overflow-hidden",
         "before:absolute before:inset-0 before:-translate-x-full before:animate-shimmer",
-        "before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent",
+        "before:bg-gradient-to-r before:from-transparent before:via-muted-foreground/10 before:to-transparent",
         className
       )}
       {...props}

@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react"
-import { Plus, Users, Edit, UserCheck } from "lucide-react"
+import { useEffect, useState, useMemo } from "react"
+import { Plus, Users, Edit, UserCheck, Search } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 import { leadershipApi } from "@/api/endpoints/leadership"
 import { Assignment, AssignmentRequest, Position, Regime } from "@/types"
 import { toast } from "sonner"
@@ -23,27 +24,36 @@ export default function AdminAssignments() {
     regimeId: 0,
   })
   const [submitting, setSubmitting] = useState(false)
+  const [userSearch, setUserSearch] = useState("")
 
   useEffect(() => {
     Promise.all([
       leadershipApi.getAssignments(),
       leadershipApi.getPositions(),
       leadershipApi.getRegimes(),
+      leadershipApi.getUsers(),
     ])
-      .then(([assignmentsRes, positionsRes, regimesRes]) => {
+      .then(([assignmentsRes, positionsRes, regimesRes, usersRes]) => {
         setAssignments(assignmentsRes)
         setPositions(positionsRes.filter(p => !p.isRetired))
         setRegimes(regimesRes)
-        // Fetch users - we'll need a users endpoint, for now use assignments data
-        const uniqueUsers = new Map<number, User>()
-        assignmentsRes.forEach(a => {
-          if (a.user) uniqueUsers.set(a.user.id, a.user)
-        })
-        setUsers(Array.from(uniqueUsers.values()))
+        // Fetch all users from the members endpoint
+        setUsers(usersRes.content || usersRes)
       })
       .catch((err) => toast.error(err.message))
       .finally(() => setLoading(false))
   }, [])
+
+  // Filter users based on search query
+  const filteredUsers = useMemo(() => {
+    if (!userSearch.trim()) return users
+    const query = userSearch.toLowerCase()
+    return users.filter(u =>
+      u.firstName.toLowerCase().includes(query) ||
+      u.lastName.toLowerCase().includes(query) ||
+      u.email.toLowerCase().includes(query)
+    )
+  }, [users, userSearch])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -104,18 +114,28 @@ export default function AdminAssignments() {
               <div className="grid gap-4 md:grid-cols-3">
                 <div>
                   <label className="block text-sm font-medium mb-1">User *</label>
-                  <Select
-                    value={formData.userId.toString()}
-                    onChange={(e) => setFormData({ ...formData, userId: parseInt(e.target.value) })}
-                    required
-                  >
-                    <option value="">Select user</option>
-                    {users.map((u) => (
-                      <option key={u.id} value={u.id.toString()}>
-                        {u.firstName} {u.lastName} ({u.email})
-                      </option>
-                    ))}
-                  </Select>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="Search user..."
+                      value={userSearch}
+                      onChange={(e) => setUserSearch(e.target.value)}
+                      className="pl-9 mb-2"
+                    />
+                    <Select
+                      value={formData.userId.toString()}
+                      onChange={(e) => setFormData({ ...formData, userId: parseInt(e.target.value) })}
+                      required
+                    >
+                      <option value="">Select user</option>
+                      {filteredUsers.map((u) => (
+                        <option key={u.id} value={u.id.toString()}>
+                          {u.firstName} {u.lastName} ({u.email})
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Position *</label>

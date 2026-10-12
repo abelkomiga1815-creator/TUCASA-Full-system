@@ -12,13 +12,14 @@ import { Label } from "@/components/ui/label"
 import { Select } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { X, Upload } from "lucide-react"
+import { ProfileCropper } from "@/components/modals/ProfileCropper"
 import { siteConfig } from "@/config/siteConfig"
 
 export default function Register() {
   const { register: registerUser } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const [cropperOpen, setCropperOpen] = useState(false)
   const [profilePicture, setProfilePicture] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
@@ -31,22 +32,10 @@ export default function Register() {
     defaultValues: { university: "UDSM", isBaptized: false }
   })
 
-  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    if (file.type !== "image/jpeg") {
-      toast.error("Only JPEG images are allowed")
-      return
-    }
-
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("File size must be less than 2MB")
-      return
-    }
-
+  const handleSavePhoto = (file: File) => {
     setProfilePicture(file)
     setPreviewUrl(URL.createObjectURL(file))
+    setCropperOpen(false)
   }
 
   const removeProfilePicture = () => {
@@ -81,10 +70,10 @@ export default function Register() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/50 to-slate-100 px-4 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-primary/5 to-muted px-4 py-10">
       <Card className="w-full max-w-2xl">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white p-1.5 shadow-soft">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-card p-1.5 shadow-soft">
             <img
               src={siteConfig.logo}
               alt="PCM Logo"
@@ -170,55 +159,40 @@ export default function Register() {
             </div>
             <div>
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" {...register("password")} />
+              <Input id="password" type="password" showPasswordToggle {...register("password")} />
               {errors.password && <p className="mt-1 text-xs text-destructive">{errors.password.message}</p>}
             </div>
             <div>
               <Label htmlFor="confirmPassword">Confirm password</Label>
-              <Input id="confirmPassword" type="password" {...register("confirmPassword")} />
+              <Input id="confirmPassword" type="password" showPasswordToggle {...register("confirmPassword")} />
               {errors.confirmPassword && (
                 <p className="mt-1 text-xs text-destructive">{errors.confirmPassword.message}</p>
               )}
             </div>
             <div className="sm:col-span-2">
-              <Label htmlFor="profilePicture" className="block mb-2">
+              <Label className="block mb-2">
                 Profile Picture (Recommended)
               </Label>
-              <div className="relative">
-                <div className="flex items-center justify-center w-full h-32 border-2 border-dashed border-muted rounded-lg bg-muted/50">
-                  {previewUrl ? (
-                    <div className="relative w-full h-full">
-                      <img
-                        src={previewUrl}
-                        alt="Profile preview"
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                      <button
-                        type="button"
-                        onClick={removeProfilePicture}
-                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                        aria-label="Remove profile picture"
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
-                      <Upload size={32} />
-                      <span className="text-sm">Click to upload or drag and drop</span>
-                      <p className="text-xs">JPG only, 3:4 ratio, max 2MB</p>
-                    </div>
-                  )}
-                  <input
-                    id="profilePicture"
-                    type="file"
-                    accept="image/jpeg"
-                    onChange={handleProfilePictureChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    disabled={loading}
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => setCropperOpen(true)}
+                disabled={loading}
+              >
+                {previewUrl ? "Change Photo" : "Add Passport Photo"}
+              </Button>
+              {previewUrl && (
+                <div className="mt-2 flex items-center justify-center gap-2">
+                  <img
+                    src={previewUrl}
+                    alt="Profile preview"
+                    className="h-16 w-16 rounded-full object-cover ring-2 ring-primary/20"
                   />
+                  <Button variant="ghost" size="sm" onClick={removeProfilePicture}>
+                    Remove
+                  </Button>
                 </div>
-              </div>
+              )}
             </div>
             <div className="sm:col-span-2">
               <Button type="submit" className="w-full" disabled={loading}>
@@ -234,6 +208,12 @@ export default function Register() {
           </p>
         </CardContent>
       </Card>
+
+      <ProfileCropper
+        open={cropperOpen}
+        onClose={() => setCropperOpen(false)}
+        onSave={handleSavePhoto}
+      />
     </div>
   )
 }

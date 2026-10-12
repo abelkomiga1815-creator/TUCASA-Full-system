@@ -1,0 +1,17 @@
+config.stopBubbling = true
+lombok.addGeneratedAnnotation = false
+lombok.addLombokGeneratedAnnotation = true
+lombok.copyableAnnotations += com.fasterxml.jackson.annotation.JsonIgnore
+lombok.copyableAnnotations += jakarta.persistence.Id
+lombok.copyableAnnotations += jakarta.persistence.Column
+lombok.copyableAnnotations += jakarta.persistence.ManyToOne
+lombok.copyableAnnotations += jakarta.persistence.OneToMany
+lombok.copyableAnnotations += jakarta.persistence.JoinColumn
+lombok.copyableAnnotations += jakarta.persistence.Table
+lombok.copyableAnnotations += jakarta.persistence.Entity
+lombok.copyableAnnotations += jakarta.persistence.GeneratedValue
+lombok.copyableAnnotations += jakarta.persistence.GenerationType
+lombok.copyableAnnotations += jakarta.persistence.Enumerated
+lombok.anyConstructor.addConstructorProperties = true
+lombok.setter.flagUsage = warning
+lombok.getter.noIsPrefix = true

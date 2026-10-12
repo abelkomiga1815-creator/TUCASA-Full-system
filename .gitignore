@@ -20,3 +20,5 @@ nohup.out
 
 # OS files
 .DS_Store
+.neon
+.env.local

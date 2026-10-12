@@ -136,6 +136,9 @@ export default function UserManagement() {
   const [actionLoading, setActionLoading] = useState(false)
   const [permissionUser, setPermissionUser] = useState<User | null>(null)
 
+  const [exportAllModalOpen, setExportAllModalOpen] = useState(false)
+  const [exportAllModalLoading, setExportAllModalLoading] = useState(false)
+
   const loadUsers = (p: number) => {
     setLoading(true)
     adminApi
@@ -172,6 +175,19 @@ export default function UserManagement() {
     } finally {
       setActionLoading(false)
       setPending(null)
+    }
+  }
+
+  const handleExportAllConfirm = async () => {
+    setExportAllModalLoading(true)
+    try {
+      await adminApi.exportAllMembers()
+      toast.success("All members exported successfully")
+    } catch {
+      toast.error("Export all members failed")
+    } finally {
+      setExportAllModalLoading(false)
+      setExportAllModalOpen(false)
     }
   }
 
@@ -280,6 +296,14 @@ export default function UserManagement() {
         )}
       </CardContent>
 
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => setExportAllModalOpen(true)}
+        disabled={exportAllModalLoading}
+      >
+        Export All Members to Excel
+      </Button>
       <ConfirmModal
         open={pending?.type === "baptize"}
         title="Confirm baptism update"
@@ -307,6 +331,16 @@ export default function UserManagement() {
         loading={actionLoading}
         onConfirm={confirmAction}
         onCancel={() => setPending(null)}
+      />
+
+      <ConfirmModal
+        open={!!exportAllModalOpen}
+        title="Export All Members"
+        description="Are you sure you want to export all eligible members' details to one Excel file?"
+        confirmLabel="Export All"
+        loading={exportAllModalLoading}
+        onConfirm={handleExportAllConfirm}
+        onCancel={() => setExportAllModalOpen(false)}
       />
 
       <PermissionModal

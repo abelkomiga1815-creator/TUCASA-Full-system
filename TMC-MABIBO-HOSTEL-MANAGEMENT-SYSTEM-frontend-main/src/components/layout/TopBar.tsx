@@ -1,35 +1,23 @@
 import { Link } from "react-router-dom"
-import { Menu, Bell, Sun, Moon } from "lucide-react"
-import { useState, useEffect } from "react"
+import { Menu, Bell, Sun, Moon, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { siteConfig } from "@/config/siteConfig"
+import { useAuth } from "@/hooks/useAuth"
+import { useTheme } from "@/hooks/useTheme"
 
 export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
-  const [darkMode, setDarkMode] = useState(false)
-
-  useEffect(() => {
-    const saved = localStorage.getItem("dark_mode")
-    if (saved !== null) {
-      setDarkMode(saved === "true")
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setDarkMode(true)
-    }
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem("dark_mode", darkMode.toString())
-    document.documentElement.classList.toggle("dark", darkMode)
-  }, [darkMode])
+  const { theme, toggleTheme } = useTheme()
+  const darkMode = theme === "dark"
+  const { user, logout } = useAuth()
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-white/80 backdrop-blur-xl px-4 shadow-soft sm:px-6 transition-shadow duration-200 hover:shadow-medium dark:bg-slate-900/80 dark:border-slate-700">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/80 backdrop-blur-xl px-4 shadow-soft sm:px-6 transition-shadow duration-200 hover:shadow-medium">
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"
           size="icon"
-          className="sm:hidden"
           onClick={onMenuClick}
-          aria-label="Open menu"
+          aria-label="Toggle navigation"
         >
           <Menu size={24} />
         </Button>
@@ -38,7 +26,7 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
           <img
             src={siteConfig.logo}
             alt="PCM Logo"
-            className="h-9 w-9 shrink-0 rounded-lg bg-white object-contain p-0.5 shadow-soft"
+            className="h-9 w-9 shrink-0 rounded-lg bg-card object-contain p-0.5 shadow-soft"
           />
           <span className="hidden flex-col leading-tight sm:flex">
             <span className="text-sm font-bold tracking-tight text-primary">
@@ -52,13 +40,24 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
       </div>
 
       <div className="flex items-center gap-1.5">
-        <Button variant="ghost" size="icon" aria-label="Toggle theme" onClick={() => setDarkMode(!darkMode)}>
+        <Button variant="ghost" size="icon" aria-label="Toggle theme" onClick={toggleTheme}>
           {darkMode ? <Sun size={20} /> : <Moon size={20} />}
         </Button>
 
         <Button variant="ghost" size="icon" aria-label="Notifications">
           <Bell size={20} />
         </Button>
+
+        {user && (
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Log out"
+            onClick={logout}
+          >
+            <LogOut size={20} />
+          </Button>
+        )}
       </div>
     </header>
   )

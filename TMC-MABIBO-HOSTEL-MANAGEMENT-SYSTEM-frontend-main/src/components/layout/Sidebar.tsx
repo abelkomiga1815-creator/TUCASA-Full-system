@@ -7,8 +7,6 @@ import {
   MessageCircle,
   Users,
   ShieldCheck,
-  ChevronLeft,
-  ChevronRight,
   Crown,
   GraduationCap,
   Building2,
@@ -27,6 +25,7 @@ import { cn } from "@/utils/cn"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { imageUrl } from "@/utils/imageUrl"
 import { siteConfig } from "@/config/siteConfig"
 
 interface NavItem {
@@ -45,11 +44,11 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/chat", label: "Chat", icon: MessageCircle },
   { to: "/about", label: "About Us", icon: Users },
   { to: "/fees", label: "My Fees", icon: Receipt },
+  { to: "/leadership", label: "Leadership Structure", icon: Building2 },
 ]
 
 const LEADER_NAV_ITEMS: NavItem[] = [
   { to: "/leader", label: "Leader Tools", icon: Crown },
-  { to: "/leadership", label: "Leadership Structure", icon: Building2 },
   { to: "/leadership/past", label: "Past Leadership", icon: GraduationCap },
 ]
 
@@ -62,15 +61,11 @@ const ADMIN_NAV_ITEMS: NavItem[] = [
 ]
 
 interface SidebarProps {
-  collapsed: boolean
-  onCollapseToggle: () => void
   mobileOpen: boolean
   onMobileClose: () => void
 }
 
 export function Sidebar({
-  collapsed,
-  onCollapseToggle,
   mobileOpen,
   onMobileClose,
 }: SidebarProps) {
@@ -131,9 +126,9 @@ export function Sidebar({
       <aside
         className={cn(
           // Base
-          "z-50 flex h-screen flex-col bg-white border-r transition-all duration-300 ease-smooth",
-          // Width
-          collapsed ? "w-16" : "w-64",
+          "z-50 flex h-screen flex-col bg-card border-r transition-all duration-300 ease-smooth",
+          // Width - always full width when rendered
+          "w-64",
           // Mobile: fixed drawer that slides in/out
           "fixed left-0 top-0 sm:relative sm:translate-x-0",
           mobileOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0",
@@ -143,15 +138,9 @@ export function Sidebar({
         aria-label="Sidebar navigation"
       >
         {/* Brand header */}
-        <div className={cn(
-          "flex h-16 items-center border-b px-4 transition-all duration-300",
-          collapsed && "justify-center"
-        )}>
+        <div className="flex h-16 items-center border-b px-4">
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-lg bg-white p-1",
-              collapsed && "mx-auto"
-            )}>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-card p-1">
               <img
                 src={siteConfig.logo}
                 alt="PCM Logo"
@@ -163,11 +152,7 @@ export function Sidebar({
                   if (fallback) fallback.style.display = 'flex';
                 }}
               />
-              <div className={cn(
-                "h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent",
-                collapsed && "mx-auto",
-                "hidden"
-              )}>
+              <div className="hidden">
                 <svg className="h-5 w-5 text-white" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M16 2L4 26h24L16 2z" stroke="white" strokeWidth="2" strokeLinejoin="round"/>
                   <path d="M16 22V10" stroke="white" strokeWidth="2" strokeLinecap="round"/>
@@ -175,10 +160,7 @@ export function Sidebar({
                 </svg>
               </div>
             </div>
-            <span className={cn(
-              "flex-col font-bold text-primary tracking-tight",
-              collapsed ? "hidden" : "flex"
-            )}>
+            <span className="flex-col font-bold text-primary tracking-tight flex">
               <span className="truncate text-sm leading-tight">{siteConfig.branchName}</span>
               <span className="truncate text-[10px] font-normal leading-tight text-muted-foreground">
                 UDSM Mabibo Hostel
@@ -201,12 +183,10 @@ export function Sidebar({
                       routeActive
                         ? "bg-gradient-to-r from-primary/10 to-primary/5 text-primary shadow-soft"
                         : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
-                      collapsed && "justify-center px-2",
                       "before:absolute before:inset-0 before:rounded-xl before:opacity-0 before:transition-opacity",
                       "hover:before:opacity-100 before:bg-primary/5"
                     )
                   }
-                  title={collapsed ? label : undefined}
                   onClick={onMobileClose}
                 >
                   <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted/50 transition-colors group-hover:bg-primary/10">
@@ -216,10 +196,8 @@ export function Sidebar({
                       "group-hover:text-primary"
                     )} aria-hidden="true" />
                   </span>
-                  {!collapsed && (
-                    <span className="truncate font-medium">{label}</span>
-                  )}
-                  {badge && !collapsed && (
+                  <span className="truncate font-medium">{label}</span>
+                  {badge && (
                     <span className={cn(
                       "absolute right-3 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1.5 text-[10px] font-bold",
                       badgeVariant === "destructive" ? "bg-destructive text-destructive-foreground" :
@@ -229,7 +207,7 @@ export function Sidebar({
                       {badge}
                     </span>
                   )}
-                  {isActive(to) && !collapsed && (
+                  {isActive(to) && (
                     <span
                       className="absolute right-3 h-6 w-0.5 rounded-full bg-primary"
                       aria-hidden="true"
@@ -242,30 +220,16 @@ export function Sidebar({
         </nav>
 
         {/* Compact semester-update indicator */}
-        {showSemesterAlert && !collapsed && (
+        {showSemesterAlert && (
           <div className="px-3 pb-2">
             <NavLink
               to="/update-semester"
               onClick={onMobileClose}
-              className="flex items-center gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm transition-colors hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+              className="flex items-center gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm transition-colors hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 dark:border-amber-800 dark:bg-amber-900/30 dark:hover:bg-amber-900/50"
             >
-              <CalendarClock size={18} className="shrink-0 text-amber-600" aria-hidden="true" />
-              <span className="flex-1 truncate font-medium text-amber-800">Semester Update</span>
+              <CalendarClock size={18} className="shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+              <span className="flex-1 truncate font-medium text-amber-800 dark:text-amber-200">Semester Update</span>
               <Badge variant="warning" size="sm">Required</Badge>
-            </NavLink>
-          </div>
-        )}
-        {showSemesterAlert && collapsed && (
-          <div className="flex justify-center px-3 pb-2">
-            <NavLink
-              to="/update-semester"
-              onClick={onMobileClose}
-              title="Semester Update Required"
-              aria-label="Semester Update Required"
-              className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-600 transition-colors hover:bg-amber-100"
-            >
-              <CalendarClock size={18} aria-hidden="true" />
-              <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-amber-500 ring-2 ring-white" aria-hidden="true" />
             </NavLink>
           </div>
         )}
@@ -278,30 +242,22 @@ export function Sidebar({
               onClick={() => setIsAccountMenuOpen((open) => !open)}
               aria-expanded={isAccountMenuOpen}
               aria-haspopup="menu"
-              className={cn(
-                "w-full justify-start gap-3 px-3 py-2.5 text-sm rounded-xl",
-                collapsed && "justify-center px-2"
-              )}
-              title={collapsed ? "User menu" : undefined}
+              className="w-full justify-start gap-3 px-3 py-2.5 text-sm rounded-xl"
             >
               <Avatar className="h-8 w-8 ring-2 ring-primary/20">
-                <AvatarImage src={user?.profilePicUrl} alt={user?.firstName} />
+                <AvatarImage src={imageUrl(user?.profilePicUrl)} alt={user?.firstName} />
                 <AvatarFallback className="text-xs font-medium">
                   {user?.firstName?.[0]}
                   {user?.lastName?.[0]}
                 </AvatarFallback>
               </Avatar>
-              {!collapsed && (
-                <div className="flex-1 min-w-0 text-left">
-                  <p className="truncate font-medium">{user?.firstName} {user?.lastName}</p>
-                  <p className="text-xs capitalize text-muted-foreground">{user?.role?.toLowerCase()}</p>
-                </div>
-              )}
-              {!collapsed && (
-                isAccountMenuOpen
-                  ? <ChevronUp size={14} aria-hidden="true" />
-                  : <ChevronDown size={14} aria-hidden="true" />
-              )}
+              <div className="flex-1 min-w-0 text-left">
+                <p className="truncate font-medium">{user?.firstName} {user?.lastName}</p>
+                <p className="text-xs capitalize text-muted-foreground">{user?.role?.toLowerCase()}</p>
+              </div>
+              {isAccountMenuOpen
+                ? <ChevronUp size={14} aria-hidden="true" />
+                : <ChevronDown size={14} aria-hidden="true" />}
             </Button>
 
             {isAccountMenuOpen && (
@@ -309,8 +265,8 @@ export function Sidebar({
                 role="menu"
                 aria-label="Account menu"
                 className={cn(
-                  "absolute bottom-full z-50 mb-2 w-52 animate-scale-in overflow-hidden rounded-xl border bg-white py-1.5 text-sm shadow-large",
-                  collapsed ? "left-0" : "left-0 right-0"
+                  "absolute bottom-full z-50 mb-2 w-52 animate-scale-in overflow-hidden rounded-xl border bg-popover py-1.5 text-sm shadow-large",
+                  "left-0 right-0"
                 )}
               >
                 <NavLink
@@ -344,18 +300,6 @@ export function Sidebar({
               </div>
             )}
           </div>
-
-          {/* Collapse toggle — desktop only, at the bottom of the sidebar */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="mt-3 hidden w-full justify-center sm:flex rounded-xl"
-            onClick={onCollapseToggle}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            aria-expanded={!collapsed}
-          >
-            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-          </Button>
         </div>
       </aside>
     </>

@@ -11,6 +11,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSel
         "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted",
         "transition-all duration-200",
         "hover:border-primary/50",
+        "dark:bg-slate-800 dark:border-slate-600 dark:text-white",
         className
       )}
       {...props}
@@ -33,6 +34,7 @@ export const SelectTrigger = forwardRef<HTMLDivElement, SelectTriggerProps>(
         "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted",
         "transition-all duration-200",
         "hover:border-primary/50",
+        "dark:bg-slate-800 dark:border-slate-600 dark:text-white",
         className
       )}
       {...props}
@@ -63,7 +65,7 @@ export const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
     <div
       ref={ref}
       className={cn(
-        "relative z-50 max-h-96 min-w-[12rem] overflow-hidden rounded-xl border bg-white py-2 text-sm shadow-large",
+        "relative z-50 max-h-96 min-w-[12rem] overflow-hidden rounded-xl border bg-popover py-2 text-sm shadow-large",
         "animate-scale-in",
         position === "popper" && "absolute",
         className

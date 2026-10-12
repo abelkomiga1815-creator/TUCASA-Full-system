@@ -55,6 +55,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        // Stored profile pictures are served to <img> tags, which
+                        // cannot carry the Authorization header, so the file
+                        // endpoint must be reachable without a token. Filenames
+                        // are unguessable UUIDs, so possession of the URL is the
+                        // only capability required to view a photo.
+                        .requestMatchers("/api/files/profiles/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")

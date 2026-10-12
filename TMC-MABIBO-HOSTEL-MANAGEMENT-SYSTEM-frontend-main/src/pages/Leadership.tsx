@@ -3,6 +3,7 @@ import { Building2, Crown } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { imageUrl } from "@/utils/imageUrl"
 import { leadershipApi } from "@/api/endpoints/leadership"
 import { Position } from "@/types"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -88,7 +89,7 @@ export default function Leadership() {
                     <CardContent className="p-6">
                       <div className="flex items-start gap-4">
                         <Avatar className="h-16 w-16 flex-shrink-0">
-                          <AvatarImage src={position.leader?.profilePicUrl} alt={position.leader ? `${position.leader.firstName} ${position.leader.lastName}` : "Vacant"} />
+                          <AvatarImage src={imageUrl(position.leader?.profilePicUrl)} alt={position.leader ? `${position.leader.firstName} ${position.leader.lastName}` : "Vacant"} />
                           <AvatarFallback className="text-lg">
                             {position.leader
                               ? `${position.leader.firstName[0]}${position.leader.lastName[0]}`
@@ -128,7 +129,7 @@ export default function Leadership() {
         })}
       </div>
 
-      <Card className="bg-slate-50 border-dashed">
+      <Card className="bg-slate-50 border-dashed dark:bg-muted/30">
         <CardContent className="p-6 text-center text-muted-foreground">
           <Building2 size={32} className="mx-auto mb-2 opacity-50" />
           <p>Vacant positions are not displayed in the public view.</p>

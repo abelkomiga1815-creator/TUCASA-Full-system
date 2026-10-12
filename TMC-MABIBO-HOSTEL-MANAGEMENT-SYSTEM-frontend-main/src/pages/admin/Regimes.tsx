@@ -198,10 +198,10 @@ export default function AdminRegimes() {
         ))}
       </div>
 
-      <Card className="bg-slate-50 border-dashed">
+      <Card className="bg-slate-50 border-dashed dark:bg-muted/30">
         <CardContent className="p-6">
           <h4 className="font-medium flex items-center gap-2">
-            <AlertTriangle size={20} className="text-amber-600" />
+            <AlertTriangle size={20} className="text-amber-600 dark:text-amber-400" />
             Important Notes
           </h4>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground list-disc list-inside">

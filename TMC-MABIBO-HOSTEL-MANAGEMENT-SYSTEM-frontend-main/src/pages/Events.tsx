@@ -2,22 +2,26 @@ import { useEffect, useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { memberApi } from "@/api/endpoints/member"
 import { permissionsApi } from "@/api/endpoints/permissions"
-import { EventItem } from "@/types"
+import { EventItem, PaginatedResponse } from "@/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calendar, Plus } from "lucide-react"
+import { Calendar, Plus, ChevronLeft, ChevronRight } from "lucide-react"
 
 export default function Events() {
   const { user } = useAuth()
-  const [events, setEvents] = useState<EventItem[]>([])
+  const [data, setData] = useState<PaginatedResponse<EventItem> | null>(null)
   const [canCreate, setCanCreate] = useState(false)
   const [permLoading, setPermLoading] = useState(true)
+  const [page, setPage] = useState(0)
+
+  const events = data?.content ?? []
+  const totalPages = data?.totalPages ?? 0
 
   useEffect(() => {
     memberApi
-      .getEvents()
-      .then(setEvents)
-  }, [])
+      .getEvents(10, page)
+      .then(setData)
+  }, [page])
 
   useEffect(() => {
     if (user?.role === "LEADER") {
@@ -60,24 +64,55 @@ export default function Events() {
           <CardTitle>Upcoming Events</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {events.map((event) => (
-              <Card key={event.id} className="border-dashed">
-                <CardContent className="p-6">
-                  <h3 className="font-semibold text-lg">{event.title}</h3>
-                  <p className="text-muted-foreground mt-1 text-sm">{event.description}</p>
-                  <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar size={14} />
-                    <span>{new Date(event.startsAt).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar size={14} />
-                    <span>{event.location}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {events.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No events found.</p>
+          ) : (
+            <>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {events.map((event) => (
+                  <Card key={event.id} className="border-dashed">
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold text-lg">{event.title}</h3>
+                      <p className="text-muted-foreground mt-1 text-sm">{event.description}</p>
+                      <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                        <Calendar size={14} />
+                        <span>{new Date(event.startsAt).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Calendar size={14} />
+                        <span>{event.location}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              {totalPages > 1 && (
+                <div className="mt-6 flex items-center justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    disabled={page === 0}
+                  >
+                    <ChevronLeft size={16} />
+                    Previous
+                  </Button>
+                  <span className="text-sm text-muted-foreground px-4">
+                    Page {page + 1} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                    disabled={page >= totalPages - 1}
+                  >
+                    Next
+                    <ChevronRight size={16} />
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

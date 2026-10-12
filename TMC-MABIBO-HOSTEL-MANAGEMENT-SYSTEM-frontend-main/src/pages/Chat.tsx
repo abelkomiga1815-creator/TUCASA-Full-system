@@ -4,6 +4,7 @@ import { useWebSocket } from "@/hooks/useWebSocket"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { imageUrl } from "@/utils/imageUrl"
 import { cn } from "@/utils/cn"
 
 export default function Chat() {
@@ -37,7 +38,7 @@ export default function Chat() {
         </span>
       </div>
 
-      <div className="flex-1 space-y-2 overflow-y-auto rounded-lg border bg-white p-3">
+      <div className="flex-1 space-y-2 overflow-y-auto rounded-lg border bg-card p-3">
         {messages.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground">No messages yet. Say hello!</p>
         ) : (
@@ -47,7 +48,7 @@ export default function Chat() {
               <div key={m.id ?? i} className={cn("flex items-end gap-2", isMe ? "justify-end" : "justify-start")}>
                 {!isMe && (
                   <Avatar className="h-7 w-7 shrink-0">
-                    <AvatarImage src={m.senderProfilePicUrl} alt={m.senderName} />
+                    <AvatarImage src={imageUrl(m.senderProfilePicUrl)} alt={m.senderName} />
                     <AvatarFallback className="text-[10px]">
                       {m.senderName?.split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase()}
                     </AvatarFallback>
@@ -56,7 +57,7 @@ export default function Chat() {
                 <div
                   className={cn(
                     "max-w-[75%] rounded-lg px-3 py-2 text-sm",
-                    isMe ? "bg-primary text-white" : "bg-muted text-foreground"
+                    isMe ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                   )}
                 >
                   {!isMe && <p className="mb-0.5 text-xs font-medium opacity-80">{m.senderName}</p>}

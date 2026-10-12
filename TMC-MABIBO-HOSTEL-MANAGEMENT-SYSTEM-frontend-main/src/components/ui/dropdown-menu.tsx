@@ -31,7 +31,7 @@ export const DropdownMenuContent = forwardRef<HTMLDivElement, DropdownMenuConten
     <div
       ref={ref}
       className={cn(
-        "relative z-50 min-w-[12rem] overflow-hidden rounded-xl border bg-white py-1.5 text-sm shadow-large",
+        "relative z-50 min-w-[12rem] overflow-hidden rounded-xl border bg-popover py-1.5 text-sm shadow-large",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         "animate-scale-in",
         align === "end" && "right-0",

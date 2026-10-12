@@ -2,6 +2,7 @@ package com.tucasa.mabibo.service;
 
 import com.tucasa.mabibo.dto.request.BaptizeRequest;
 import com.tucasa.mabibo.dto.request.RoleChangeRequest;
+import com.tucasa.mabibo.dto.request.AdminResetPasswordRequest;
 import com.tucasa.mabibo.dto.response.DashboardStatsResponse;
 import com.tucasa.mabibo.dto.response.UserResponse;
 import com.tucasa.mabibo.exception.BusinessRuleViolationException;
@@ -10,15 +11,18 @@ import com.tucasa.mabibo.model.entity.*;
 import com.tucasa.mabibo.model.enums.Role;
 import com.tucasa.mabibo.model.enums.UserStatus;
 import com.tucasa.mabibo.repository.*;
+import com.tucasa.mabibo.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
+import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -33,6 +37,8 @@ public class AdminService {
     private final MembershipFeeRepository feeRepository;
     private final SemesterRepository semesterRepository;
     private final EmailService emailService;
+    private final AuthService authService;
+    private final MemberExportService memberExportService;
 
     @Transactional(readOnly = true)
     public Page<UserResponse> searchMembers(Short branchId, Role role, UserStatus status, Short yearOfStudy, Pageable pageable) {
@@ -51,6 +57,12 @@ public class AdminService {
         user.setRole(request.getRole());
         userRepository.save(user);
         return UserResponse.fromEntity(user);
+    }
+
+    @Transactional
+    public UserResponse adminResetPassword(Long memberId, AdminResetPasswordRequest request) {
+        User member = findUser(memberId);
+        return authService.adminResetPassword(memberId, request);
     }
 
     /**
@@ -183,6 +195,8 @@ public class AdminService {
             pendingFees = feeRepository.countByStatus(MembershipFee.STATUS_PENDING);
         }
 
+        long baptized = userRepository.countByBranchIdAndIsBaptized(branchId, true);
+
         Map<String, Long> byRole = new LinkedHashMap<>();
         for (Role r : Role.values()) {
             byRole.put(r.name(), userRepository.countByBranchIdAndRole(branchId, r));
@@ -193,12 +207,26 @@ public class AdminService {
                 .activeMembers(active)
                 .alumniCount(alumni)
                 .suspendedCount(suspended)
-                .baptizedCount(0) // populated via a dedicated repository method in a full implementation
+                .baptizedCount(baptized)
                 .pendingReports(reportRepository.findByBranchIdAndStatus(branchId, com.tucasa.mabibo.model.enums.ReportStatus.PENDING).size())
                 .pendingFeesCount(pendingFees)
                 .membersByRole(byRole)
                 .membersByYear(Map.of())
                 .build();
+    }
+
+    /**
+     * Export selected members to Excel workbook.
+     */
+    public byte[] exportMembers(List<Long> memberIds) throws IOException {
+        return memberExportService.exportMembers(memberIds);
+    }
+
+    /**
+     * Export all members for a branch to Excel workbook.
+     */
+    public byte[] exportAllMembers(Short branchId) throws IOException {
+        return memberExportService.exportAllMembers(branchId);
     }
 
     private User findUser(Long userId) {

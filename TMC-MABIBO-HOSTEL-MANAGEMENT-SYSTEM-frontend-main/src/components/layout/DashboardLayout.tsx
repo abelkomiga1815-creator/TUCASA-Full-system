@@ -19,19 +19,27 @@ export function DashboardLayout({ children }: { children?: React.ReactNode }) {
     localStorage.setItem("sidebar_collapsed", collapsed.toString())
   }, [collapsed])
 
+  const handleSidebarToggle = () => {
+    if (window.innerWidth < 640) {
+      setMobileOpen(!mobileOpen)
+    } else {
+      setCollapsed(!collapsed)
+    }
+  }
+
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
-      {/* Sidebar — owns its own collapse state via props */}
-      <Sidebar
-        collapsed={collapsed}
-        onCollapseToggle={() => setCollapsed(!collapsed)}
-        mobileOpen={mobileOpen}
-        onMobileClose={() => setMobileOpen(false)}
-      />
+    <div className="flex h-screen overflow-hidden bg-background">
+      {/* Sidebar */}
+      {!collapsed && (
+        <Sidebar
+          mobileOpen={mobileOpen}
+          onMobileClose={() => setMobileOpen(false)}
+        />
+      )}
 
       {/* Right column: TopBar + scrollable main + Footer */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <TopBar onMenuClick={() => setMobileOpen(true)} />
+        <TopBar onMenuClick={handleSidebarToggle} />
 
         <main className="flex-1 overflow-y-auto">
           <div className="p-4 sm:p-6 lg:p-8">

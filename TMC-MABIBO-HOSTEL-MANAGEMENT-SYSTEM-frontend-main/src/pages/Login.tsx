@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
+import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
@@ -13,9 +13,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { siteConfig } from "@/config/siteConfig"
 
 export default function Login() {
-  const { login, redirectByRole, user } = useAuth()
+  const { login, redirectByRole } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [loading, setLoading] = useState(false)
+
+  const notice = (location.state as { notice?: string } | null)?.notice
 
   const {
     register,
@@ -26,11 +29,18 @@ export default function Login() {
   const onSubmit = async (values: LoginFormValues) => {
     setLoading(true)
     try {
-      await login(values)
+      const res = await login(values)
+
+      // An admin-issued temporary password still has to be replaced: send the
+      // user straight to the forced password-change page.
+      if (res.user.mustChangePassword) {
+        navigate("/force-password-change", { replace: true })
+        return
+      }
+
       toast.success("Welcome back")
       // Use role-based redirect
-      const targetPath = user ? redirectByRole(user.role) : "/dashboard"
-      navigate(targetPath)
+      navigate(redirectByRole(res.user.role))
     } catch (err: unknown) {
       const message = axios.isAxiosError<{ message?: string }>(err)
         ? err.response?.data?.message
@@ -42,7 +52,7 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/50 to-slate-100 px-4 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-primary/5 to-muted px-4 py-10">
       <Card className="w-full max-w-4xl overflow-hidden p-0">
         <div className="grid md:grid-cols-2">
           {/* Branding panel */}
@@ -59,7 +69,7 @@ export default function Login() {
               <img
                 src={siteConfig.logo}
                 alt="PCM Logo"
-                className="h-12 w-12 rounded-xl bg-white object-contain p-1 shadow-medium"
+                className="h-12 w-12 rounded-xl bg-card object-contain p-1 shadow-medium"
               />
               <div className="leading-tight">
                 <p className="text-sm font-bold tracking-tight">{siteConfig.branchName}</p>
@@ -84,13 +94,21 @@ export default function Login() {
           {/* Form panel */}
           <div className="p-6 sm:p-8">
             <CardHeader className="p-0 text-left">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white p-1 shadow-soft md:hidden">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-card p-1 shadow-soft md:hidden">
                 <img src={siteConfig.logo} alt="PCM Logo" className="h-full w-full object-contain" />
               </div>
               <CardTitle className="text-2xl">Welcome back</CardTitle>
               <CardDescription>Sign in to {siteConfig.branchName}</CardDescription>
             </CardHeader>
             <CardContent className="p-0 pt-6">
+              {notice && (
+                <div
+                  role="status"
+                  className="mb-4 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800 dark:border-green-800 dark:bg-green-900/30 dark:text-green-200"
+                >
+                  {notice}
+                </div>
+              )}
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div>
                   <Label htmlFor="email">Email</Label>
@@ -101,7 +119,7 @@ export default function Login() {
                 </div>
                 <div>
                   <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" {...register("password")} />
+                  <Input id="password" type="password" showPasswordToggle {...register("password")} />
                   {errors.password && (
                     <p className="mt-1 text-xs text-destructive">{errors.password.message}</p>
                   )}
@@ -119,7 +137,7 @@ export default function Login() {
               <p className="mt-3 text-center text-sm text-muted-foreground">
                 Forgot password?{" "}
                 <Link to="/forgot-password" className="text-primary font-medium hover:underline">
-                  Reset password
+                  Contact Administrator
                 </Link>
               </p>
             </CardContent>

@@ -27,7 +27,7 @@ export function Dialog({ open, onOpenChange, children, size = "default" }: Dialo
     >
       <div
         className={cn(
-          "w-full rounded-2xl bg-white shadow-2xl animate-scale-in",
+          "w-full rounded-2xl bg-card shadow-2xl animate-scale-in",
           sizeClasses[size]
         )}
         onClick={(e) => e.stopPropagation()}
